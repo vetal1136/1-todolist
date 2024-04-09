@@ -1,4 +1,4 @@
-import React, {ChangeEvent, JSX, KeyboardEvent, useRef, useState} from 'react';
+import React, {JSX, useRef, useState} from 'react';
 import {FilterValuesType} from "./App";
 
 type TodoListPropsType = {
@@ -24,8 +24,8 @@ export const TodoList = ({
                          }: TodoListPropsType) => {
 
     const [filter, setFilter] = useState<FilterValuesType>("all")
-    const [taskTitle, setTaskTitle] = useState("")
 
+    const taskTitleInput = useRef<HTMLInputElement>(null)
 
     const getTasksForTodolist = (allTasks: Array<TaskType>, nextFilterValue: FilterValuesType) => {
 
@@ -40,53 +40,37 @@ export const TodoList = ({
     }
 
     const tasksForTodolist = getTasksForTodolist(tasks, filter)
-    const isTitleTooLong = taskTitle.length > 15
-    const ifTaskCanAdded = taskTitle && !isTitleTooLong
 
-    const tasksList: Array<JSX.Element> | JSX.Element = tasks.length
-        ? tasksForTodolist.map(task => {
-            const onClickRemoveTaskHandler = () => removeTask(task.id)
-            return (<li>
-                <input type="checkbox" checked={task.isDone}/> <span>{task.title}</span>
-                <button onClick={onClickRemoveTaskHandler}>x</button>
-            </li>)
-        })
-        : <div>Your tasksList is empty</div>
+    const tasksList: Array<JSX.Element> = tasksForTodolist.map(task => {
+        const removeTaskHandler = () => removeTask(task.id)
+        return (<li>
+            <input type="checkbox" checked={task.isDone}/> <span>{task.title}</span>
+            <button onClick={removeTaskHandler}>x</button>
+        </li>)
+    })
+
+
+
 
     const onClickHandlerCreator = (filter: FilterValuesType) => {
         return () => setFilter(filter)
     }
 
     const onClickAddTaskHandler = () => {
-        addTask(taskTitle)
-        setTaskTitle("")
-    }
-
-    const onChangeSetTaskTitle = (e: ChangeEvent<HTMLInputElement>) => {
-        setTaskTitle(e.currentTarget.value)
-    }
-
-    const onKeyDownAddTaskHandler = (e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "Enter" && ifTaskCanAdded) {
-            onClickAddTaskHandler()
+        if(taskTitleInput.current) {
+            const newTaskTitle = taskTitleInput.current.value
+            addTask(newTaskTitle)
+            taskTitleInput.current.value = ""
         }
+
     }
 
     return (
         <div className="todolist">
             <h3>{title}</h3>
             <div>
-                <input
-                    value={taskTitle}
-                    onChange={onChangeSetTaskTitle}
-                    onKeyDown={onKeyDownAddTaskHandler}
-                />
-                <button
-                    disabled={!ifTaskCanAdded}
-                    onClick={onClickAddTaskHandler
-                    }>+
-                </button>
-                {isTitleTooLong && <div>Your task title is too long</div>}
+                <input ref={taskTitleInput}/>
+                <button onClick={onClickAddTaskHandler}>+</button>
             </div>
             <ul>
                 {tasksList}
