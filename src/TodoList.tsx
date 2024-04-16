@@ -6,6 +6,7 @@ type TodoListPropsType = {
     tasks: Array<TaskType>
     addTask: (title: string) => void
     removeTask: (taskId: string) => void
+    changeTaskStatus: (taskId: string, newIsDone: boolean) => void
 
 }
 
@@ -20,11 +21,13 @@ export const TodoList = ({
                              tasks,
                              addTask,
                              removeTask,
+                             changeTaskStatus
                              // changeTodolistFilter
                          }: TodoListPropsType) => {
 
     const [filter, setFilter] = useState<FilterValuesType>("all")
     const [taskTitle, setTaskTitle] = useState("")
+    const [taskInputError, setTaskInputError] = useState<string | null>(null)
 
 
     const getTasksForTodolist = (allTasks: Array<TaskType>, nextFilterValue: FilterValuesType) => {
@@ -46,8 +49,13 @@ export const TodoList = ({
     const tasksList: Array<JSX.Element> | JSX.Element = tasks.length
         ? tasksForTodolist.map(task => {
             const onClickRemoveTaskHandler = () => removeTask(task.id)
-            return (<li>
-                <input type="checkbox" checked={task.isDone}/> <span>{task.title}</span>
+            const onChangeSetTaskStatusHandler = (e: ChangeEvent<HTMLInputElement>) => changeTaskStatus(task.id, e.currentTarget.checked)
+            return (<li key={task.id}>
+                <input
+                    type="checkbox"
+                    checked={task.isDone}
+                    onChange={onChangeSetTaskStatusHandler}
+                /> <span className={task.isDone ? "task-done" : "task"}>{task.title}</span>
                 <button onClick={onClickRemoveTaskHandler}>x</button>
             </li>)
         })
@@ -58,11 +66,18 @@ export const TodoList = ({
     }
 
     const onClickAddTaskHandler = () => {
-        addTask(taskTitle)
+        const trimmedTaskTitle = taskTitle.trim()
+        if (trimmedTaskTitle) {
+            addTask(trimmedTaskTitle)
+            setTaskInputError(null)
+        } else {
+            setTaskInputError("Field is empty")
+        }
         setTaskTitle("")
     }
 
     const onChangeSetTaskTitle = (e: ChangeEvent<HTMLInputElement>) => {
+        setTaskInputError(null)
         setTaskTitle(e.currentTarget.value)
     }
 
@@ -77,6 +92,7 @@ export const TodoList = ({
             <h3>{title}</h3>
             <div>
                 <input
+                    className={taskInputError ? "task-input-error" : ""}
                     value={taskTitle}
                     onChange={onChangeSetTaskTitle}
                     onKeyDown={onKeyDownAddTaskHandler}
@@ -87,14 +103,24 @@ export const TodoList = ({
                     }>+
                 </button>
                 {isTitleTooLong && <div>Your task title is too long</div>}
+                {taskInputError && <div className="task-input-error-message">{taskInputError}</div>}
             </div>
             <ul>
-                {tasksList}
+            {tasksList}
             </ul>
             <div>
-                <button onClick={onClickHandlerCreator("all")}>All</button>
-                <button onClick={onClickHandlerCreator("active")}>Active</button>
-                <button onClick={onClickHandlerCreator("completed")}>Completed</button>
+                <button
+                    className={filter === "all" ? "filter-btn-active" : ""}
+                    onClick={onClickHandlerCreator("all")}>All
+                </button>
+                <button
+                    className={filter === "active" ? "filter-btn-active" : ""}
+                    onClick={onClickHandlerCreator("active")}>Active
+                </button>
+                <button
+                    className={filter === "completed" ? "filter-btn-active" : ""}
+                    onClick={onClickHandlerCreator("completed")}>Completed
+                </button>
             </div>
         </div>
     );

@@ -14,3 +14,31 @@
   border-radius: 5px;
   padding: 15px;
 }
+
+.task {
+  font-weight: bold;
+}
+
+.task-done {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+.filter-btn-active {
+  background-color: #a167c7;
+  color: white;
+  font-weight: bold;
+  border: 2px solid #a167c7;
+  border-radius: 3px;
+}
+
+.task-input-error {
+  border: 3px solid #f51f1f;
+  outline: none;
+  border-radius: 3px;
+}
+
+.task-input-error-message {
+  font-weight: bold;
+  color: red;
+}

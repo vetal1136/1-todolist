@@ -4,6 +4,13 @@ import {TaskType, TodoList} from "./TodoList";
 import {v1} from "uuid";
 
 
+// CRUD
+// Create
+// Read
+// Update
+// Delete
+
+
 export type FilterValuesType = "all" | "active" | "completed"
 
 function App() {
@@ -33,6 +40,17 @@ function App() {
         setTasks(newState)
     }
 
+    const changeTaskStatus = (taskId: string, newIsDone: boolean) => {
+        // const task = tasks.find(t => t.id === taskId)
+        //     if(task) {
+        //
+        //         task.isDone = newIsDone
+        //         setTasks([...tasks])
+        //     }
+        const newState = tasks.map(t => t.id === taskId ? {...t, isDone: newIsDone} : t)
+        setTasks(newState)
+    }
+
     return (
         <div className="App">
             <TodoList
@@ -40,6 +58,7 @@ function App() {
                 tasks={tasks}
                 removeTask={removeTask}
                 addTask={addTask}
+                changeTaskStatus={changeTaskStatus}
             />
         </div>
     );
